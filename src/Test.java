@@ -2,9 +2,13 @@
 public class Test {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		PingServer server = new PingServer();
-		server.run();
+		
+		//PingServer server = new PingServer();
+		//server.run();
+		
+		Pinger client = new Pinger();
+		client.run();
+		System.out.print("Success");
 
 	}
 
