@@ -1,4 +1,3 @@
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -17,8 +16,18 @@ public class Pinger {
     private DatagramSocket ds;
     private InetAddress ip;
     int timeout = 1000;
-    private String host_dest = "constance.cs.rutgers.edu";
+    private String host_dest = "localhost";
 	private int port_dest = 5530;
+	
+	/**
+	 * Launch the Client application.
+	 */
+	public static void main(String[] args) {
+		
+		System.out.println("Please wait one moment...");
+		Pinger client = new Pinger();
+		client.run();
+	}
 	
     public Pinger() {
     	try {
@@ -38,14 +47,15 @@ public class Pinger {
     // Default behavior is to send 10 PING messages using UDP
     public void run() {
     	
+    	
     	Scanner scan = new Scanner(System.in);
-    	System.out.println("Enter 'y' to use default host and port server (constance.cs.rutgers.edu 5530).");
-    	System.out.println("Otherwise enter the host name as a single token");
+    	System.out.println("Enter 'y' to use default host and port server (localhost 5530).");
+    	System.out.println("Otherwise enter the host name as a single token and return");
     	String userHost = scan.next();
     	if (userHost.equals("y")) {
     		// Do default behavior
     	} else {
-    		System.out.println("Now enter the port number as a single token");
+    		System.out.println("Now enter the port number as a single token and return");
     		String portStr = scan.next();
     		Integer userPort = Integer.parseInt(portStr);
     		setHost_dest(userHost);
@@ -59,7 +69,7 @@ public class Pinger {
     		
     		String payload = createPayload(i);
     		
-    		//Ask for Destination IP and Port
+    		// Get Destination IP and Port
     		String host_dest = getHost_dest();
     		int port_dest = getPort_dest();
 
@@ -71,6 +81,7 @@ public class Pinger {
 				
 				// send Packet through UDP
 				byte[] payloadBytes = message.getPayload().getBytes();
+				System.out.printf("Contacting host: %s at port %d\n", host_dest, port_dest);
 				DatagramPacket packet = new DatagramPacket(payloadBytes, payloadBytes.length, IP_dest, port_dest);
 				
 				Date date1 = new Date();

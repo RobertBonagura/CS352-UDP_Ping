@@ -9,14 +9,18 @@ import java.util.Random;
 public class PingServer {
 
 	/* Variable declarations. */
-	private DatagramSocket socket;
-	private int PORT_NUMBER = 5533;
+	private DatagramSocket ds;
+	private int PORT_NUMBER = 5530;
 	private int PACKET_SIZE = 512;
     private byte[] buffer = new byte[PACKET_SIZE];
     private double LOSS_RATE = 0.3;
     private int AVERAGE_DELAY = 100;
     
-    /* Methods */
+    public static void main(String[] args) {
+		
+		PingServer server = new PingServer();
+		server.run();
+    }
     
     /* 
      * Constructor creates a connection to a DatagramSocket using PortNumber. 
@@ -24,7 +28,7 @@ public class PingServer {
     public PingServer() {
     	
     	try {
-			socket = new DatagramSocket(PORT_NUMBER);
+			ds = new DatagramSocket(PORT_NUMBER);
 		} catch (SocketException e) {
 			System.out.println("Error: Server side Datagram Socket could not be opened.");
 			e.printStackTrace();
@@ -35,13 +39,14 @@ public class PingServer {
      * Generates a random number and determines whether or not their should
      * be a packet loss, resulting in the return of the appropriate boolean value.
      */
-    public boolean losePackets() {
+    public boolean losePacket() {
     	
     	boolean packetLoss;
     	
     	// Generate a random number between 0 and 1.
-        Random random = new Random(new Date().getTime());
-        if (random.nextFloat() < LOSS_RATE) {
+    	double randNum = Math.random();
+    	System.out.println(randNum);
+        if (randNum <= LOSS_RATE) {
         	packetLoss = true;
         } else {
         	packetLoss = false;
@@ -54,20 +59,19 @@ public class PingServer {
      */
     public void run() {
     	
+    	System.out.println("Ping server running...");
     	while (true) {
     		
     		DatagramPacket packet = new DatagramPacket(buffer, PACKET_SIZE);
     		try {
-				socket.receive(packet);
+    			//simulate transmission delay
+    			Random random = new Random(new Date().getTime());
+    			System.out.println("Waiting for UDP Packet...");
+				Thread.sleep((long) (Math.random() * 2 * AVERAGE_DELAY));
+				ds.receive(packet);
 			} catch (IOException e) {
 				System.out.println("Error: Server side Datagram Socket could not receive packet.");
 				e.printStackTrace();
-			}
-    		
-    		//simulate transmission delay; DOUBLE = 2
-			Random random = new Random(new Date().getTime());
-    		try {
-				Thread.sleep((int)(random.nextDouble() * 2 * AVERAGE_DELAY));
 			} catch (InterruptedException e) {
 				System.out.println("Error: Failed to call Thread.sleep()");
 				e.printStackTrace();
@@ -78,13 +82,23 @@ public class PingServer {
     		packet = new DatagramPacket(buffer, buffer.length, address, port);
     		
     		try {
-				socket.send(packet);
+				Thread.sleep((long) (Math.random() * 2 * AVERAGE_DELAY));
+    			String output = packet.getSocketAddress().toString();
+    			String payload = new String(buffer, "UTF-8");
+				System.out.printf("Received from: %s %s\n", output, payload);
+    			
+    			if (losePacket()) {
+    				System.out.println("Packet loss..., reply not sent.");
+    			} else {
+    				ds.send(packet);
+    				System.out.println("Reply sent");
+    			}
+				
 			} catch (IOException e) {
-				System.out.println("Error: Failed to send packet.");
+				System.out.println("Packet loss..., reply not sent.");
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-    		
-    		socket.close();
     		
 
     	}
