@@ -5,10 +5,9 @@ public class Test {
 		
 		//PingServer server = new PingServer();
 		//server.run();
-		
+	
 		Pinger client = new Pinger();
 		client.run();
-		System.out.print("Success");
 
 	}
 

@@ -23,6 +23,11 @@ public class PingMessage {
 	}
 	
 	public String getPayload() {
+		
+		int sequenceNumber = 111;
+		Date date = new Date();
+		long timestamp = date.getTime();
+		payload = "PING " + sequenceNumber + " " + timestamp;
 		return payload;
 	}
 	
